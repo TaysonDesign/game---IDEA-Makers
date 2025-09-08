@@ -1,0 +1,214 @@
+
+
+
+
+
+<div id="gameArea">
+
+
+  
+  <!-- السلة -->
+  <div id="basket">
+    <span id="basketLabel">IDEA Makers</span>
+    <div id="collectedPoints">
+      <div class="point prog">0</div>
+      <div class="point cashier">0</div>
+      <div class="point ads">0</div>
+      <div class="point maps">0</div>
+      <div class="point social">0</div>
+    </div>
+  </div>
+
+  <!-- لوحة النقاط -->
+  <div id="scoreBoard">Score: 0</div>
+
+  <!-- مؤشرات الخدمات -->
+  <div id="serviceIndicators">
+    <div class="serviceIndicator" id="prog">برمجة 💻: 0 / 30</div>
+    <div class="serviceIndicator" id="cashier">برنامج كاشير 💾: 0 / 30</div>
+    <div class="serviceIndicator" id="ads">إعلانات 📢: 0 / 30</div>
+    <div class="serviceIndicator" id="maps">خرائط جوجل 📍: 0 / 30</div>
+    <div class="serviceIndicator" id="social">سوشيال ميديا 📱: 0 / 30</div>
+  </div>
+</div>
+
+<!-- شاشة الفوز -->
+<div id="winScreen">
+  <div id="winContent">
+    <h2 id="winServiceName"></h2>
+    <h1>🎉 مبروك! حصلت على خصمك من IDEA Makers 🎉</h1>
+    <div id="collectedServices"></div>
+    <img src="logo.png" alt="IDEA Makers Logo" id="logo">
+    <p>خُد سكرين للشاشة دي وابعتها لنا على الواتساب لاستلام الخصم.</p>
+    <a href="https://ideamakers-eg.com/%d8%aa%d9%88%d8%a7%d8%b5%d9%84-%d9%85%d8%b9%d9%86%d8%a7/" target="_blank" id="ctaBtn">تواصل معنا</a>
+  </div>
+</div>
+
+
+
+<style>
+
+
+/* نسخ CSS من الملف الكامل هنا */
+body {
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:linear-gradient(to bottom,#4b0082,#6a0dad);
+  overflow:hidden;
+  color:#fff;
+  text-align:center;
+}
+#gameArea{position:relative;width:100%;height:80vh;overflow:hidden;background:radial-gradient(circle at center,#6a0dad,#4b0082);}
+#basket{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);width:180px;height:70px;background:#fff;border-radius:25px;box-shadow:0 0 30px #fff;display:flex;flex-direction:column;align-items:center;}
+#basketLabel{font-weight:bold;color:#6a0dad;margin-top:5px;}
+#collectedPoints{display:flex;justify-content:center;margin-top:5px;flex-wrap:wrap;}
+.point{width:28px;height:28px;border-radius:50%;margin:3px;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#000;font-size:14px;animation:glowPoint 0.8s infinite alternate;}
+.point.prog{background:#FFD700;}
+.point.cashier{background:#00FF7F;}
+.point.ads{background:#1E90FF;}
+.point.maps{background:#FF69B4;}
+.point.social{background:#FFA500;}
+@keyframes glowPoint{from{box-shadow:0 0 5px #fff;}to{box-shadow:0 0 20px #fff;}}
+#scoreBoard{position:absolute;top:10px;left:10px;font-size:20px;font-weight:bold;}
+#serviceIndicators{position:absolute;top:50px;left:10px;font-size:18px;text-align:left;}
+.serviceIndicator{margin-bottom:5px;}
+.service,.bomb{position:absolute;width:70px;height:70px;border-radius:50%;text-align:center;line-height:70px;font-weight:bold;font-size:14px;cursor:pointer;user-select:none;}
+.service{animation:glow 1s infinite alternate;color:#000;}
+.bomb{background:red;color:#fff;animation:rotateBomb 1s linear infinite;}
+@keyframes rotateBomb{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+@keyframes glow{from{box-shadow:0 0 10px #fff,0 0 20px #ff0;}to{box-shadow:0 0 30px #fff,0 0 60px #ff0;}}
+#winScreen{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);color:#fff;z-index:1000;padding-top:50px;text-align:center;}
+#logo{width:200px;margin:20px 0;animation:glow 1s infinite alternate;}
+#ctaBtn{display:inline-block;padding:15px 30px;background:#FFD700;color:#4b0082;font-size:18px;font-weight:bold;text-decoration:none;border-radius:10px;margin-top:20px;transition: transform 0.2s ease, background 0.2s ease;}
+#ctaBtn:hover{transform: scale(1.1);background:#fff;color:#6a0dad;}
+
+
+
+
+</style>
+
+
+
+<script>
+
+
+
+
+/* نسخ JS من الملف الكامل هنا */
+const gameArea=document.getElementById('gameArea');
+const basket=document.getElementById('basket');
+const scoreBoard=document.getElementById('scoreBoard');
+const winScreen=document.getElementById('winScreen');
+const collectedServicesDiv=document.getElementById('collectedServices');
+const collectedPointsDiv=document.getElementById('collectedPoints');
+const winServiceName=document.getElementById('winServiceName');
+
+const serviceIndicators={
+'برمجة 💻':document.getElementById('prog'),
+'برنامج كاشير 💾':document.getElementById('cashier'),
+'إعلانات 📢':document.getElementById('ads'),
+'خرائط جوجل 📍':document.getElementById('maps'),
+'سوشيال ميديا 📱':document.getElementById('social')
+};
+
+let score=0;
+const services=[
+{name:'برمجة 💻',points:1,goal:30,color:'#FFD700',class:'prog'},
+{name:'برنامج كاشير 💾',points:1,goal:30,color:'#00FF7F',class:'cashier'},
+{name:'إعلانات 📢',points:1,goal:30,color:'#1E90FF',class:'ads'},
+{name:'خرائط جوجل 📍',points:1,goal:30,color:'#FF69B4',class:'maps'},
+{name:'سوشيال ميديا 📱',points:1,goal:30,color:'#FFA500',class:'social'}
+];
+let collectedCount={};
+services.forEach(s=>collectedCount[s.name]=0);
+
+document.addEventListener('mousemove',e=>{
+  let x=e.clientX-gameArea.getBoundingClientRect().left-basket.offsetWidth/2;
+  x=Math.max(0,Math.min(x,gameArea.offsetWidth-basket.offsetWidth));
+  basket.style.left=x+'px';
+});
+document.addEventListener('touchmove',e=>{
+  e.preventDefault();
+  let touch=e.touches[0];
+  let x=touch.clientX-gameArea.getBoundingClientRect().left-basket.offsetWidth/2;
+  x=Math.max(0,Math.min(x,gameArea.offsetWidth-basket.offsetWidth));
+  basket.style.left=x+'px';
+},{passive:false});
+
+function updatePoints(service){
+  const pointsDiv=collectedPointsDiv.querySelector(`.point.${service.class}`);
+  if(pointsDiv){
+    pointsDiv.innerText=collectedCount[service.name];
+  }
+}
+
+function checkWin(serviceName){
+  for(const s of services){
+    if(collectedCount[s.name]>=s.goal){
+      winServiceName.innerText=`الخدمة: ${s.name}`;
+      collectedServicesDiv.innerHTML='';
+      for(const s of services){
+        collectedServicesDiv.innerHTML+=`<p>${s.name}: ${collectedCount[s.name]} نقطة</p>`;
+      }
+      winScreen.style.display='block';
+      clearInterval(fallInterval);
+      return;
+    }
+  }
+}
+
+function createFallingItem(){
+  const isBomb=Math.random()<0.15;
+  const div=document.createElement('div');
+  div.classList.add(isBomb?'bomb':'service');
+  if(!isBomb){
+    const service=services[Math.floor(Math.random()*services.length)];
+    div.dataset.name=service.name;
+    div.dataset.class=service.class;
+    div.innerHTML=service.name;
+    div.style.background=service.color;
+  }else{
+    div.innerText='💣';
+  }
+  div.style.left=Math.random()*(gameArea.offsetWidth-70)+'px';
+  div.style.top='-70px';
+  gameArea.appendChild(div);
+  let horizDir=Math.random()<0.5?-1:1;
+  function animate(){
+    let top=parseInt(div.style.top),left=parseInt(div.style.left);
+    if(top>gameArea.offsetHeight-70){div.remove();return;}
+    div.style.top=top+4+'px';
+    div.style.left=left+horizDir*2+'px';
+    if(left<0 || left>gameArea.offsetWidth-70) horizDir*=-1;
+    let basketRect=basket.getBoundingClientRect();
+    let divRect=div.getBoundingClientRect();
+    if(!(divRect.right<basketRect.left || divRect.left>basketRect.right || divRect.bottom<basketRect.top || divRect.top>basketRect.bottom)){
+      if(isBomb){
+        for(const s of services){
+          collectedCount[s.name]=Math.max(0,collectedCount[s.name]-2);
+          serviceIndicators[s.name].innerText=`${s.name}: ${collectedCount[s.name]} / 30`;
+        }
+        score=Math.max(0,score-2*services.length);
+        scoreBoard.innerText=`Score: ${score}`;
+        alert('💣 انفجرت! خسرت 2 نقاط من كل خدمة!');
+      }else{
+        collectedCount[div.dataset.name]++;
+        serviceIndicators[div.dataset.name].innerText=`${div.dataset.name}: ${collectedCount[div.dataset.name]} / 30`;
+        score++;
+        updatePoints(services.find(s=>s.name===div.dataset.name));
+        checkWin(div.dataset.name);
+        scoreBoard.innerText=`Score: ${score}`;
+      }
+      div.remove();
+      return;
+    }
+    requestAnimationFrame(animate);
+  }
+  animate();
+}
+
+const fallInterval=setInterval(createFallingItem,800);
+
+
+
+</script>
